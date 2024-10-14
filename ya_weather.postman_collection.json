@@ -1,0 +1,1249 @@
+{
+	"info": {
+		"_postman_id": "02ec60d4-589c-44c0-bbce-87e968bcbcb0",
+		"name": "ya_weather",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "35027978",
+		"_collection_link": "https://www.postman.com/spacecraft-administrator-91068562/workspace/yapogoda/collection/35027978-02ec60d4-589c-44c0-bbce-87e968bcbcb0?action=share&source=collection_link&creator=35027978"
+	},
+	"item": [
+		{
+			"name": "№1 Check Presence of Temperature Field",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Temperature field exists\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data.weatherByPoint.now).to.have.property(\"temperature\");\r",
+							"});\r",
+							"pm.test(\"Temperature is a number\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data.weatherByPoint.now.temperature).to.be.a('number');\r",
+							"});\r",
+							"pm.test(\"Temperature is within valid range\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var temp = jsonData.data.weatherByPoint.now.temperature;\r",
+							"    pm.expect(temp).to.be.within(-100, 100);\r",
+							"});\r",
+							"pm.test(\"Response time is less than 1000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"pm.test(\"Content-Type is application/json\", function () {\r",
+							"    pm.response.to.have.header(\"Content-Type\", \"application/json\");\r",
+							"});\r",
+							"pm.test(\"Check if access is denied for basic role\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    \r",
+							"    // Проверяем, есть ли сообщение об отказе в доступе для базовой роли\r",
+							"    if (jsonData.errors && jsonData.errors[0].message === \"access denied for basic role\") {\r",
+							"        pm.expect.fail(\"Access denied for basic role\");\r",
+							"    } else {\r",
+							"        pm.expect(true).to.be.true;\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Yandex-Weather-Key",
+						"value": "{{TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"query\": \"query { weatherByPoint(request: { lat: 55.751244, lon: 37.618423 }) { now { temperature } } }\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{url}}",
+				"description": "StartFragment\n\n- **Steps**:\n    \n    1. Send a POST request to the Yandex Weather API with the GraphQL query to get the weather data for specific coordinates.\n        \n    2. Check that the response contains the `now` object with relevant weather fields like `temperature`, `cloudiness`, and `humidity`.\n        \n    3. Verify that the `temperature` field is a number within a valid range.\n        \n    4. Check that the response time is less than 1 second.\n        \n    5. Ensure that the `Content-Type` is `application/json`.\n        \n- **Expected Result**:\n    \n    - The `temperature` field is present and is a valid number within the range.\n        \n    - The response status is 200, and the response time is acceptable.\n        \n\nEndFragment"
+			},
+			"response": []
+		},
+		{
+			"name": "№2 Get Current Weather Data (Temperature, Humidity, Wind Speed)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test #1: Проверка статуса ответа\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Test #2: Проверка наличия поля temperature\r",
+							"pm.test(\"Response contains temperature field\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data.weatherByPoint.now.temperature).to.be.a(\"number\");\r",
+							"});\r",
+							"\r",
+							"// Test #3: Проверка наличия поля humidity\r",
+							"pm.test(\"Response contains humidity field\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data.weatherByPoint.now.humidity).to.be.a(\"number\");\r",
+							"});\r",
+							"\r",
+							"// Test #4: Проверка наличия поля windSpeed\r",
+							"pm.test(\"Response contains windSpeed field\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data.weatherByPoint.now.windSpeed).to.be.a(\"number\");\r",
+							"});\r",
+							"pm.test(\"Check if access is denied for basic role\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    \r",
+							"    // Проверяем, есть ли сообщение об отказе в доступе для базовой роли\r",
+							"    if (jsonData.errors && jsonData.errors[0].message === \"access denied for basic role\") {\r",
+							"        pm.expect.fail(\"Access denied for basic role\");\r",
+							"    } else {\r",
+							"        pm.expect(true).to.be.true;\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Yandex-Weather-Key",
+						"value": "{{TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"query\": \"query { weatherByPoint(request: { lat: 52.37125, lon: 4.89388 }) { now { temperature humidity windSpeed } } }\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{url}}",
+				"description": "StartFragment\n\n- **Steps**:\n    \n    1. Send a POST request to the Yandex Weather API with the GraphQL query to get the weather data for specific coordinates.\n        \n    2. Check that the response contains the `now` object with relevant weather fields like `temperature`, `cloudiness`, and `humidity`.\n        \n    3. Verify that the `temperature` field is a number within a valid range.\n        \n    4. Check that the response time is less than 1 second.\n        \n    5. Ensure that the `Content-Type` is `application/json`.\n        \n- **Expected Result**:\n    \n    - The `temperature` field is present and is a valid number within the range.\n        \n    - The response status is 200, and the response time is acceptable.\n        \n\nEndFragment"
+			},
+			"response": []
+		},
+		{
+			"name": "№3 Advanced Weather Data: Cloudiness, Pressure, and Precipitation Type",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is less than 1000ms\", function () {\r",
+							"  pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"pm.test(\"Cloudiness field is present and valid\", function () {\r",
+							"  var jsonData = pm.response.json();\r",
+							"  pm.expect(jsonData.data.weatherByPoint.now).to.have.property('cloudiness');\r",
+							"  pm.expect([\"CLEAR\", \"PARTLY_CLOUDY\", \"CLOUDY\", \"OVERCAST\"]).to.include(jsonData.data.weatherByPoint.now.cloudiness);\r",
+							"});\r",
+							"pm.test(\"Pressure field is present and valid\", function () {\r",
+							"  var jsonData = pm.response.json();\r",
+							"  pm.expect(jsonData.data.weatherByPoint.now).to.have.property('pressure');\r",
+							"  pm.expect(jsonData.data.weatherByPoint.now.pressure).to.be.a('number');\r",
+							"  pm.expect(jsonData.data.weatherByPoint.now.pressure).to.be.within(700, 800); // Adjusted based on the returned data (763)\r",
+							"});\r",
+							"pm.test(\"Precipitation type is valid\", function () {\r",
+							"  var jsonData = pm.response.json();\r",
+							"  pm.expect(jsonData.data.weatherByPoint.now).to.have.property('precType');\r",
+							"  pm.expect([\"NO_TYPE\", \"RAIN\", \"SNOW\", \"MIXED\"]).to.include(jsonData.data.weatherByPoint.now.precType);\r",
+							"});\r",
+							"pm.test(\"Cloudiness, Pressure, and Precipitation Type Check\", function () {\r",
+							"  var jsonData = pm.response.json();\r",
+							"\r",
+							"  // Cloudiness Check\r",
+							"  pm.expect(jsonData.data.weatherByPoint.now).to.have.property('cloudiness');\r",
+							"  pm.expect([\"CLEAR\", \"PARTLY_CLOUDY\", \"CLOUDY\", \"OVERCAST\"]).to.include(jsonData.data.weatherByPoint.now.cloudiness);\r",
+							"\r",
+							"  // Pressure Check\r",
+							"  pm.expect(jsonData.data.weatherByPoint.now).to.have.property('pressure');\r",
+							"  pm.expect(jsonData.data.weatherByPoint.now.pressure).to.be.a('number');\r",
+							"  pm.expect(jsonData.data.weatherByPoint.now.pressure).to.be.within(700, 800); // Adjusted range\r",
+							"\r",
+							"  // Precipitation Type Check\r",
+							"  pm.expect(jsonData.data.weatherByPoint.now).to.have.property('precType');\r",
+							"  pm.expect([\"NO_TYPE\", \"RAIN\", \"SNOW\", \"MIXED\"]).to.include(jsonData.data.weatherByPoint.now.precType);\r",
+							"});\r",
+							"pm.test(\"Check if access is denied for basic role\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    \r",
+							"    // Проверяем, есть ли сообщение об отказе в доступе для базовой роли\r",
+							"    if (jsonData.errors && jsonData.errors[0].message === \"access denied for basic role\") {\r",
+							"        pm.expect.fail(\"Access denied for basic role\");\r",
+							"    } else {\r",
+							"        pm.expect(true).to.be.true;\r",
+							"    }\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Yandex-Weather-Key",
+						"value": "{{TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"query\": \"query { weatherByPoint(request: { lat: 52.37125, lon: 4.89388 }) { now { cloudiness pressure precType } } }\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{url}}",
+				"description": "StartFragment\n\n- **Cloudiness Value Check:**\n    \n    - **Description:** This test checks if the `cloudiness` field is present in the response and contains a valid value. The expected values for `cloudiness` include `CLEAR`, `PARTLY_CLOUDY`, `CLOUDY`, and `OVERCAST`.\n        \n    - **Steps:**\n        \n        1. Send a POST request to the Yandex Weather API.\n            \n        2. Verify that the `cloudiness` field is present in the response under `now`.\n            \n        3. Ensure the `cloudiness` field contains a valid value from the expected list.\n            \n- **Pressure Unit and Value Check:**\n    \n    - **Description:** This test checks if the `pressure` field is present in the response, is a number, and falls within a valid range (700-800 mmHg).\n        \n    - **Steps:**\n        \n        1. Send a POST request to the Yandex Weather API.\n            \n        2. Verify that the `pressure` field is present in the response under `now`.\n            \n        3. Ensure the `pressure` field is a valid number and lies between 700 and 800 mmHg.\n            \n- **Precipitation Type Validation:**\n    \n    - **Description:** This test checks if the `precType` field is present in the response and contains a valid precipitation type. The expected values for `precType` are `NO_TYPE`, `RAIN`, `SNOW`, and `MIXED`.\n        \n    - **Steps:**\n        \n        1. Send a POST request to the Yandex Weather API.\n            \n        2. Verify that the `precType` field is present in the response under `now`.\n            \n        3. Ensure the `precType` field contains one of the expected precipitation types.\n            \n- **Combined Weather Parameter Check:**\n    \n    - **Description:** This test validates that the `cloudiness`, `pressure`, and `precType` fields are present in the response and have valid values.\n        \n    - **Steps:**\n        \n        1. Send a POST request to the Yandex Weather API.\n            \n        2. Verify that the `cloudiness` field is present, and ensure its value is valid (`CLEAR`, `PARTLY_CLOUDY`, `CLOUDY`, or `OVERCAST`).\n            \n        3. Verify that the `pressure` field is present, and check that its value is a valid number between 700 and 800 mmHg.\n            \n        4. Verify that the `precType` field is present, and ensure its value is a valid precipitation type (`NO_TYPE`, `RAIN`, `SNOW`, or `MIXED`).\n            \n\nEndFragment"
+			},
+			"response": []
+		},
+		{
+			"name": "№4: Check Full Weather Data Including AQI and Precipitation Forecast",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Temperature is present and valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data.weatherByPoint.now).to.have.property(\"temperature\");\r",
+							"    pm.expect(jsonData.data.weatherByPoint.now.temperature).to.be.a(\"number\");\r",
+							"});\r",
+							"pm.test(\"Pressure is valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data.weatherByPoint.now.pressure).to.be.within(700, 1100);\r",
+							"});\r",
+							"pm.test(\"Wind Speed is present and valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data.weatherByPoint.now).to.have.property(\"windSpeed\");\r",
+							"    pm.expect(jsonData.data.weatherByPoint.now.windSpeed).to.be.a(\"number\");\r",
+							"});\r",
+							"pm.test(\"Visibility is present and valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data.weatherByPoint.now).to.have.property(\"visibility\");\r",
+							"    pm.expect(jsonData.data.weatherByPoint.now.visibility).to.be.within(0, 10000);\r",
+							"});\r",
+							"pm.test(\"Check if access is denied for basic role\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    \r",
+							"    // Проверяем, есть ли сообщение об отказе в доступе для базовой роли\r",
+							"    if (jsonData.errors && jsonData.errors[0].message === \"access denied for basic role\") {\r",
+							"        pm.expect.fail(\"Access denied for basic role\");\r",
+							"    } else {\r",
+							"        pm.expect(true).to.be.true;\r",
+							"    }\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Yandex-Weather-Key",
+						"value": "{{TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"query\": \"query { weatherByPoint(request: { lat: 52.37125, lon: 4.89388 }) { now { temperature, humidity, pressure, windSpeed, windDirection, cloudiness, precType, precStrength, visibility, condition } } }\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{url}}",
+				"description": "StartFragment\n\n- **Temperature Check**: Validates the presence of the temperature field and ensures it is a number.\n    \n- **Pressure Check**: Validates the presence of the pressure field and ensures its value falls between 900 and 1100 hPa.\n    \n- **Wind Speed Check**: Ensures that the `windSpeed` field is present and its value is valid (numeric).\n    \n- **Visibility Check**: Verifies that the visibility field is present and the value is within the range of 0 to 10,000 meters.\n    \n\nEndFragment"
+			},
+			"response": []
+		},
+		{
+			"name": "№5 Historical Weather Data for Specific Period and Location",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Fixed TypeError by adding a null check for jsonData.data.weatherByPoint\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Max day temperature is within valid range\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"        jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"            pm.expect(day.maxDayTemperature).to.be.within(-50, 50);\r",
+							"        });\r",
+							"    }\r",
+							"});\r",
+							"pm.test(\"Pressure is valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"        jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"            pm.expect(day.pressure).to.be.within(900, 1100);\r",
+							"        });\r",
+							"    }\r",
+							"});\r",
+							"pm.test(\"Max wind speed is valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"        jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"            if (day.maxWindSpeed) {\r",
+							"                pm.expect(day.maxWindSpeed).to.be.a(\"number\");\r",
+							"                pm.expect(day.maxWindSpeed).to.be.within(0, 150);\r",
+							"            }\r",
+							"        });\r",
+							"    }\r",
+							"});\r",
+							"pm.test(\"Min wind speed is valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"        jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"            if (day.minWindSpeed) {\r",
+							"                pm.expect(day.minWindSpeed).to.be.a(\"number\");\r",
+							"                pm.expect(day.minWindSpeed).to.be.within(0, 150);\r",
+							"            }\r",
+							"        });\r",
+							"    }\r",
+							"});\r",
+							"pm.test(\"Humidity is valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"        jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"            if (day.humidity) {\r",
+							"                pm.expect(day.humidity).to.be.a(\"number\");\r",
+							"                pm.expect(day.humidity).to.be.within(0, 100);\r",
+							"            }\r",
+							"        });\r",
+							"    }\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Precipitation type and strength are valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"        jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"            if (day.precType && day.precStrength) {\r",
+							"                pm.expect(day.precType).to.be.a(\"number\");\r",
+							"                pm.expect([0, 1, 2, 3]).to.include(day.precType);\r",
+							"                pm.expect(day.precStrength).to.be.a(\"number\");\r",
+							"                pm.expect(day.precStrength).to.be.within(0, 10);\r",
+							"            }\r",
+							"        });\r",
+							"    }\r",
+							"});\r",
+							"pm.test(\"Precipitation amount is valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"        jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"            if (day.prec) {\r",
+							"                pm.expect(day.prec).to.be.a(\"number\");\r",
+							"                pm.expect(day.prec).to.be.within(0, 500);  // В зависимости от региона\r",
+							"            }\r",
+							"        });\r",
+							"    }\r",
+							"});\r",
+							"pm.test(\"Check if access is denied for basic role\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    \r",
+							"    // Проверяем, есть ли сообщение об отказе в доступе для базовой роли\r",
+							"    if (jsonData.errors && jsonData.errors[0].message === \"access denied for basic role\") {\r",
+							"        pm.expect.fail(\"Access denied for basic role\");\r",
+							"    } else {\r",
+							"        pm.expect(true).to.be.true;\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Yandex-Weather-Key",
+						"value": "{{TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"query\": \"query { weatherByPoint(request: { lat: 52.37125, lon: 4.89388 }) { climate { days(limit: 5, offset: 10) { maxDayTemperature, humidity, pressure, maxWindSpeed, minWindSpeed, prec, precType, precStrength } } } }\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{url}}",
+				"description": "StartFragment\n\n- **Send a GraphQL query** to retrieve historical weather data for the last 5 days using the provided coordinates.\n    \n- **Validate all fields** in the `days` array, including temperature, pressure, humidity, wind speeds, and precipitation.\n    \n- Ensure that **precipitation type and strength** match the expected values and that data is returned in a valid range.\n    \n\nEndFragment"
+			},
+			"response": []
+		},
+		{
+			"name": "№6: Retrieve and Validate Meteorological Station Data Over Time",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Тест на проверку статус-кода 200\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Тест на проверку наличия ошибки \"Access denied for basic role\"\r",
+							"pm.test(\"Check if access is denied for basic role\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData.errors && jsonData.errors[0].message === \"access denied for basic role\") {\r",
+							"        pm.expect.fail(\"Access denied for basic role\");\r",
+							"    } else {\r",
+							"        pm.expect(true).to.be.true; // Если ошибки нет, продолжаем проверку остальных тестов\r",
+							"    }\r",
+							"});\r",
+							"\r",
+							"// Тест на проверку наличия ID станции\r",
+							"pm.test(\"Station ID is present\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData.data && jsonData.data.stationsByTimeRange.length > 0) {\r",
+							"        jsonData.data.stationsByTimeRange.forEach(station => {\r",
+							"            pm.expect(station.id).to.be.a('string');\r",
+							"        });\r",
+							"    } else {\r",
+							"        pm.expect.fail(\"Station data is missing or not accessible\");\r",
+							"    }\r",
+							"});\r",
+							"\r",
+							"// Тест на проверку температуры\r",
+							"pm.test(\"Temperature is within valid range\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData.data && jsonData.data.stationsByTimeRange.length > 0) {\r",
+							"        jsonData.data.stationsByTimeRange.forEach(station => {\r",
+							"            pm.expect(station.temperature).to.be.within(-100, 100); // допустимые значения температуры\r",
+							"        });\r",
+							"    } else {\r",
+							"        pm.expect.fail(\"Temperature data is missing or not accessible\");\r",
+							"    }\r",
+							"});\r",
+							"\r",
+							"// Тест на проверку давления\r",
+							"pm.test(\"Pressure is within valid range\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData.data && jsonData.data.stationsByTimeRange.length > 0) {\r",
+							"        jsonData.data.stationsByTimeRange.forEach(station => {\r",
+							"            pm.expect(station.pressure).to.be.within(900, 1100); // допустимые значения давления\r",
+							"        });\r",
+							"    } else {\r",
+							"        pm.expect.fail(\"Pressure data is missing or not accessible\");\r",
+							"    }\r",
+							"});\r",
+							"\r",
+							"// Тест на проверку скорости ветра\r",
+							"pm.test(\"Wind speed is within valid range\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData.data && jsonData.data.stationsByTimeRange.length > 0) {\r",
+							"        jsonData.data.stationsByTimeRange.forEach(station => {\r",
+							"            pm.expect(station.windSpeed).to.be.within(0, 150); // допустимые значения скорости ветра\r",
+							"        });\r",
+							"    } else {\r",
+							"        pm.expect.fail(\"Wind speed data is missing or not accessible\");\r",
+							"    }\r",
+							"});\r",
+							"\r",
+							"// Тест на проверку направления ветра\r",
+							"pm.test(\"Wind direction is valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData.data && jsonData.data.stationsByTimeRange.length > 0) {\r",
+							"        jsonData.data.stationsByTimeRange.forEach(station => {\r",
+							"            pm.expect(station.windDirection).to.be.a('number');\r",
+							"            pm.expect(station.windDirection).to.be.within(0, 360); // допустимые значения направления ветра\r",
+							"        });\r",
+							"    } else {\r",
+							"        pm.expect.fail(\"Wind direction data is missing or not accessible\");\r",
+							"    }\r",
+							"});\r",
+							"\r",
+							"// Тест на проверку влажности\r",
+							"pm.test(\"Humidity is valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData.data && jsonData.data.stationsByTimeRange.length > 0) {\r",
+							"        jsonData.data.stationsByTimeRange.forEach(station => {\r",
+							"            pm.expect(station.humidity).to.be.within(0, 100); // допустимые значения влажности\r",
+							"        });\r",
+							"    } else {\r",
+							"        pm.expect.fail(\"Humidity data is missing or not accessible\");\r",
+							"    }\r",
+							"});\r",
+							"\r",
+							"// Тест на проверку осадков\r",
+							"pm.test(\"Precipitation amount is valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData.data && jsonData.data.stationsByTimeRange.length > 0) {\r",
+							"        jsonData.data.stationsByTimeRange.forEach(station => {\r",
+							"            pm.expect(station.prec).to.be.a('number');\r",
+							"            pm.expect(station.prec).to.be.within(0, 500); // допустимые значения осадков\r",
+							"        });\r",
+							"    } else {\r",
+							"        pm.expect.fail(\"Precipitation data is missing or not accessible\");\r",
+							"    }\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Yandex-Weather-Key",
+						"value": "{{TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"query\": \"query { stationsByTimeRange(request: { lat: 52.37125, lon: 4.89388 }, timeRange: { from: \\\"1662038400\\\", to: \\\"1662124800\\\" }) { id name distance time temperature pressure windSpeed windDirection humidity prec } }\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{url}}",
+				"description": "StartFragment\n\n- **Status Code Check (200)**\n    \n    - **Purpose**: Ensure that the server responds with a status code of 200, indicating that the request was successful.\n        \n    - **Expected Result**: The server returns status code 200.\n        \n    - **Steps**:\n        \n        1. Send a POST request to the Yandex Weather API for retrieving meteorological station data over a specified time range.\n            \n        2. Verify that the status code of the response is 200.\n            \n- **Access Denied for Basic Role**\n    \n    - **Purpose**: Verify that the request is not blocked due to access limitations for the basic role. If access is denied, further tests are canceled.\n        \n    - **Expected Result**: No \"access denied for basic role\" message is returned in the response.\n        \n    - **Steps**:\n        \n        1. Check if the response contains an error message \"access denied for basic role.\"\n            \n        2. If the message is present, cancel all other tests and fail this one.\n            \n- **Station ID Validation**\n    \n    - **Purpose**: Validate that each station in the response has a valid `id`.\n        \n    - **Expected Result**: The `id` field for each station is present and is a string.\n        \n    - **Steps**:\n        \n        1. Loop through the stations returned in the response.\n            \n        2. Validate that the `id` field for each station is a non-empty string.\n            \n- **Temperature Validation**\n    \n    - **Purpose**: Verify that the temperature reported by each station falls within a valid range.\n        \n    - **Expected Result**: Temperature values are between -100°C and 100°C.\n        \n    - **Steps**:\n        \n        1. Loop through the stations returned in the response.\n            \n        2. Validate that the `temperature` field is within the expected range (-100 to 100).\n            \n- **Pressure Validation**\n    \n    - **Purpose**: Ensure that the pressure values reported by each station are within a valid range.\n        \n    - **Expected Result**: Pressure values are between 900 hPa and 1100 hPa.\n        \n    - **Steps**:\n        \n        1. Loop through the stations returned in the response.\n            \n        2. Validate that the `pressure` field is between 900 and 1100.\n            \n- **Wind Speed Validation**\n    \n    - **Purpose**: Ensure that the reported wind speed is within an acceptable range.\n        \n    - **Expected Result**: Wind speed values are between 0 m/s and 150 m/s.\n        \n    - **Steps**:\n        \n        1. Loop through the stations returned in the response.\n            \n        2. Validate that the `windSpeed` field is between 0 and 150.\n            \n- **Wind Direction Validation**\n    \n    - **Purpose**: Verify that the wind direction is a valid degree value.\n        \n    - **Expected Result**: Wind direction values are between 0° and 360°.\n        \n    - **Steps**:\n        \n        1. Loop through the stations returned in the response.\n            \n        2. Validate that the `windDirection` field is a number between 0 and 360.\n            \n- **Humidity Validation**\n    \n    - **Purpose**: Ensure that the humidity values are within the normal range.\n        \n    - **Expected Result**: Humidity values are between 0% and 100%.\n        \n    - **Steps**:\n        \n        1. Loop through the stations returned in the response.\n            \n        2. Validate that the `humidity` field is within the 0-100 range.\n            \n- **Precipitation Amount Validation**\n    \n    - **Purpose**: Validate the amount of precipitation reported by the stations.\n        \n    - **Expected Result**: Precipitation values are between 0 mm and 500 mm.\n        \n    - **Steps**:\n        \n        1. Loop through the stations returned in the response.\n            \n        2. Validate that the `prec` (precipitation) field is between 0 and 500 mm.\n            \n\nEndFragment"
+			},
+			"response": []
+		},
+		{
+			"name": "№7 Retrieve Climate Data for the Next 10 Days",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Fixed TypeError by adding a null check for jsonData.data.weatherByPoint\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Check if access is denied for basic role\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData.errors && jsonData.errors[0].message === \"access denied for basic role\") {\r",
+							"        pm.expect.fail(\"Access denied for basic role\");\r",
+							"    }\r",
+							"});\r",
+							"\r",
+							"if (!pm.response.json().errors || pm.response.json().errors[0].message !== \"access denied for basic role\"){\r",
+							"pm.test(\"Pressure is valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"        jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"            pm.expect(day.pressure).to.be.within(900, 1100);\r",
+							"        });\r",
+							"    }\r",
+							"});\r",
+							"pm.test(\"Max wind speed is valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"        jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"            if (day.maxWindSpeed) {\r",
+							"                pm.expect(day.maxWindSpeed).to.be.a(\"number\");\r",
+							"                pm.expect(day.maxWindSpeed).to.be.within(0, 150);\r",
+							"            }\r",
+							"        });\r",
+							"    }\r",
+							"});\r",
+							"pm.test(\"Min wind speed is valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"        jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"            if (day.minWindSpeed) {\r",
+							"                pm.expect(day.minWindSpeed).to.be.a(\"number\");\r",
+							"                pm.expect(day.minWindSpeed).to.be.within(0, 150);\r",
+							"            }\r",
+							"        });\r",
+							"    }\r",
+							"});\r",
+							"pm.test(\"Humidity is valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"        jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"            if (day.humidity) {\r",
+							"                pm.expect(day.humidity).to.be.a(\"number\");\r",
+							"                pm.expect(day.humidity).to.be.within(0, 100);\r",
+							"            }\r",
+							"        });\r",
+							"    }\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Precipitation type and strength are valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"        jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"            if (day.precType && day.precStrength) {\r",
+							"                pm.expect(day.precType).to.be.a(\"number\");\r",
+							"                pm.expect([0, 1, 2, 3]).to.include(day.precType);\r",
+							"                pm.expect(day.precStrength).to.be.a(\"number\");\r",
+							"                pm.expect(day.precStrength).to.be.within(0, 10);\r",
+							"            }\r",
+							"        });\r",
+							"    }\r",
+							"});\r",
+							"pm.test(\"Precipitation amount is valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"        jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"            if (day.prec) {\r",
+							"                pm.expect(day.prec).to.be.a(\"number\");\r",
+							"                pm.expect(day.prec).to.be.within(0, 500);  // В зависимости от региона\r",
+							"            }\r",
+							"        });\r",
+							"    }\r",
+							"});\r",
+							"pm.test(\"Max day temperature is within valid range\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"        jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"            pm.expect(day.maxDayTemperature).to.be.within(-50, 50);\r",
+							"        });\r",
+							"    }\r",
+							"});\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Yandex-Weather-Key",
+						"value": "{{TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"query\": \"query { weatherByPoint(request: { lat: 53.718786, lon: 44.453126 }) { climate { days(limit: 10, offset: 0) { maxWindSpeed minWindSpeed maxDayTemperature humidity pressure precStrength } } } }\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{url}}",
+				"description": "StartFragment\n\n- **Status Code Check (200)**\n    \n    - **Purpose**: Ensure that the server responds with a status code of 200, confirming that the request was successfully processed.\n        \n    - **Expected Result**: The server returns status code 200.\n        \n    - **Steps**:\n        \n        1. Send a POST request to the Yandex Weather API for retrieving climate data.\n            \n        2. Verify that the status code of the response is 200.\n            \n- **Access Denied for Basic Role**\n    \n    - **Purpose**: Verify that the request is not blocked due to access limitations for the basic role. If access is denied, all further tests will be canceled.\n        \n    - **Expected Result**: No \"access denied for basic role\" message should be returned.\n        \n    - **Steps**:\n        \n        1. Check if the response contains an error message: \"access denied for basic role.\"\n            \n        2. If the message is present, fail the test and prevent further tests from running.\n            \n- **Pressure Validation**\n    \n    - **Purpose**: Validate that the pressure values are within the correct range.\n        \n    - **Expected Result**: Pressure values should be between 900 and 1100 hPa.\n        \n    - **Steps**:\n        \n        1. Loop through the climate data for each day.\n            \n        2. Ensure that the pressure value is between 900 and 1100 hPa.\n            \n- **Max Wind Speed Validation**\n    \n    - **Purpose**: Ensure that the maximum wind speed is within a valid range.\n        \n    - **Expected Result**: Max wind speed should be a number between 0 and 150 m/s.\n        \n    - **Steps**:\n        \n        1. Loop through the climate data for each day.\n            \n        2. Verify that the max wind speed is within the expected range (0-150 m/s).\n            \n- **Min Wind Speed Validation**\n    \n    - **Purpose**: Ensure that the minimum wind speed is within a valid range.\n        \n    - **Expected Result**: Min wind speed should be a number between 0 and 150 m/s.\n        \n    - **Steps**:\n        \n        1. Loop through the climate data for each day.\n            \n        2. Verify that the min wind speed is within the expected range (0-150 m/s).\n            \n- **Humidity Validation**\n    \n    - **Purpose**: Ensure that the humidity values are within a valid range.\n        \n    - **Expected Result**: Humidity should be a number between 0% and 100%.\n        \n    - **Steps**:\n        \n        1. Loop through the climate data for each day.\n            \n        2. Verify that the humidity is within the expected range (0-100%).\n            \n- **Precipitation Type and Strength Validation**\n    \n    - **Purpose**: Ensure that precipitation type and strength are valid.\n        \n    - **Expected Result**: Precipitation type should be one of \\[0, 1, 2, 3\\], and precipitation strength should be between 0 and 10.\n        \n    - **Steps**:\n        \n        1. Loop through the climate data for each day.\n            \n        2. Verify that the `precType` is within the valid set \\[0, 1, 2, 3\\].\n            \n        3. Check that `precStrength` is a number between 0 and 10.\n            \n- **Precipitation Amount Validation**\n    \n    - **Purpose**: Ensure that the precipitation amount is within the expected range.\n        \n    - **Expected Result**: Precipitation values should be between 0 and 500 mm.\n        \n    - **Steps**:\n        \n        1. Loop through the climate data for each day.\n            \n        2. Verify that precipitation amount is within the range (0-500 mm), depending on the region.\n            \n- **Max Day Temperature Validation**\n    \n    - **Purpose**: Ensure that the maximum daytime temperature is within a valid range.\n        \n    - **Expected Result**: Max day temperature should be between -50°C and 50°C.\n        \n    - **Steps**:\n        \n        1. Loop through the climate data for each day.\n            \n        2. Verify that the max daytime temperature is within the valid range (-50°C to 50°C).\n            \n\nEndFragment  \nStartFragment **Access Denied for Basic Role**EndFragment  \nStartFragment\n\n- **Purpose**: If the test checking for \"access denied for basic role\" fails, it indicates that access to the requested data is restricted for your account's basic role. If this happens, all further validation tests are canceled, as they would be irrelevant without access to the data.\n    \n- **Mechanism**:\n    \n    1. The second test checks if \"access denied for basic role\" is returned in the API response.\n        \n    2. If the message is present, the test fails using `pm.expect.fail()`, which stops the execution of subsequent tests.\n        \n    3. If the access check passes (i.e., no such message is found), only then do the other validation tests proceed.\n        \n\nEndFragment"
+			},
+			"response": []
+		},
+		{
+			"name": "№8  Check and Validate Climate Forecast Data for Next 10 Days",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Check if access is denied for basic role\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData.errors && jsonData.errors[0].message === \"access denied for basic role\") {\r",
+							"        pm.expect.fail(\"Access denied for basic role\");\r",
+							"    }\r",
+							"});\r",
+							"if (!pm.response.json().errors || pm.response.json().errors[0].message !== \"access denied for basic role\") {\r",
+							"    pm.test(\"Max wind speed is valid\", function () {\r",
+							"        var jsonData = pm.response.json();\r",
+							"        if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"            jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"                if (day.maxWindSpeed) {\r",
+							"                    pm.expect(day.maxWindSpeed).to.be.a(\"number\");\r",
+							"                    pm.expect(day.maxWindSpeed).to.be.within(0, 150);\r",
+							"                }\r",
+							"            });\r",
+							"        }\r",
+							"    });\r",
+							"    pm.test(\"Min wind speed is valid\", function () {\r",
+							"        var jsonData = pm.response.json();\r",
+							"        if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"            jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"                if (day.minWindSpeed) {\r",
+							"                    pm.expect(day.minWindSpeed).to.be.a(\"number\");\r",
+							"                    pm.expect(day.minWindSpeed).to.be.within(0, 150);\r",
+							"                }\r",
+							"            });\r",
+							"        }\r",
+							"    });\r",
+							"    pm.test(\"Max day temperature is valid\", function () {\r",
+							"        var jsonData = pm.response.json();\r",
+							"        if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"            jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"                pm.expect(day.maxDayTemperature).to.be.within(-50, 50);\r",
+							"            });\r",
+							"        }\r",
+							"    });\r",
+							"    pm.test(\"Humidity is valid\", function () {\r",
+							"        var jsonData = pm.response.json();\r",
+							"        if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"            jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"                pm.expect(day.humidity).to.be.within(0, 100);\r",
+							"            });\r",
+							"        }\r",
+							"    });\r",
+							"    pm.test(\"Pressure is valid\", function () {\r",
+							"        var jsonData = pm.response.json();\r",
+							"        if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"            jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"                pm.expect(day.pressure).to.be.within(900, 1100);\r",
+							"            });\r",
+							"        }\r",
+							"    });\r",
+							"    pm.test(\"Precipitation type and strength are valid\", function () {\r",
+							"        var jsonData = pm.response.json();\r",
+							"        if (jsonData && jsonData.data && jsonData.data.weatherByPoint && jsonData.data.weatherByPoint.climate && jsonData.data.weatherByPoint.climate.days) {\r",
+							"            jsonData.data.weatherByPoint.climate.days.forEach(day => {\r",
+							"                pm.expect([0, 1, 2, 3]).to.include(day.precType);\r",
+							"                pm.expect(day.precStrength).to.be.within(0, 10);\r",
+							"            });\r",
+							"        }\r",
+							"    });\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Yandex-Weather-Key",
+						"value": "{{TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"query\": \"query { weatherByPoint(request: { lat: 52.37125, lon: 4.89388 }) { climate { days(limit: 10, offset: 0) { maxWindSpeed minWindSpeed maxDayTemperature humidity pressure precType precStrength } } } }\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{url}}",
+				"description": "StartFragment\n\n### **Description for Test №8**\n\n1. **Status Code Check (200)**:  \n    Verifies that the response status is 200, confirming that the request was successfully processed.\n    \n2. **Access Denied for Basic Role**:  \n    Checks whether access is denied for a basic role. If access is denied, subsequent tests are skipped.\n    \n3. **Max Wind Speed Validation**:  \n    Ensures that the maximum wind speed is a valid number between 0 and 150 m/s.\n    \n4. **Min Wind Speed Validation**:  \n    Ensures that the minimum wind speed is a valid number between 0 and 150 m/s.\n    \n5. **Max Day Temperature Validation**:  \n    Validates that the maximum day temperature is within the range of -50°C to 50°C.\n    \n6. **Humidity Validation**:  \n    Confirms that humidity values fall within the valid range of 0% to 100%.\n    \n7. **Pressure Validation**:  \n    Verifies that pressure values are within the valid range of 900 to 1100 hPa.\n    \n8. **Precipitation Type and Strength Validation**:  \n    Ensures that the precipitation type is one of \\[0, 1, 2, 3\\], and the strength is within 0 to 10.\n    \n\nEach test runs sequentially, with access control being a gating factor—if the basic role is denied access, no further tests are executed.\n\nEndFragment"
+			},
+			"response": []
+		},
+		{
+			"name": "№9 Retrieve and Validate 48-Hour Weather Forecast Data for a Specific Location",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Check if access is denied for basic role\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData.errors && jsonData.errors[0].message === \"access denied for basic role\") {\r",
+							"        pm.expect.fail(\"Access denied for basic role\");\r",
+							"    }\r",
+							"});\r",
+							"\r",
+							"if (!pm.response.json().errors || pm.response.json().errors[0].message !== \"access denied for basic role\") {\r",
+							"\r",
+							"if (!pm.response.json().errors || pm.response.json().errors[0].message !== \"access denied for basic role\") {\r",
+							"    pm.test(\"Temperature in Celsius is present and valid\", function () {\r",
+							"        var jsonData = pm.response.json();\r",
+							"        var tempC = jsonData.data.weatherByPoint.now.c;\r",
+							"        pm.expect(tempC).to.be.a(\"number\");\r",
+							"        pm.expect(tempC).to.be.within(-100, 100); // Диапазон может варьироваться\r",
+							"    });\r",
+							"}\r",
+							"if (!pm.response.json().errors || pm.response.json().errors[0].message !== \"access denied for basic role\") {\r",
+							"    pm.test(\"Temperature in Celsius is present and valid\", function () {\r",
+							"        var jsonData = pm.response.json();\r",
+							"        var tempC = jsonData.data.weatherByPoint.now.c;\r",
+							"        pm.expect(tempC).to.be.a(\"number\");\r",
+							"        pm.expect(tempC).to.be.within(-100, 100); // Диапазон может варьироваться\r",
+							"    });\r",
+							"}\r",
+							"pm.test(\"Temperature in Fahrenheit is present and valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var tempF = jsonData.data.weatherByPoint.now.f;\r",
+							"    pm.expect(tempF).to.be.a(\"number\");\r",
+							"    pm.expect(tempF).to.be.within(-200, 200); // Диапазон может варьироваться\r",
+							"});\r",
+							"pm.test(\"Weather icon is present and in SVG format\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var iconUrl = jsonData.data.weatherByPoint.now.icon;\r",
+							"    pm.expect(iconUrl).to.be.a(\"string\");\r",
+							"    pm.expect(iconUrl).to.contain(\".svg\");\r",
+							"});\r",
+							"pm.test(\"Forecast data for 48 hours is valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var forecastHours = jsonData.data.weatherByPoint.forecast.hours.edges;\r",
+							"    pm.expect(forecastHours.length).to.equal(48); // Проверяем, что получили прогноз на 48 часов\r",
+							"    \r",
+							"    forecastHours.forEach(hour => {\r",
+							"        pm.expect(hour.node.timestamp).to.be.a(\"string\"); // Проверяем формат временной метки\r",
+							"        pm.expect(hour.node.temperature).to.be.a(\"number\"); // Проверяем, что температура — число\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Yandex-Weather-Key",
+						"value": "{{TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"query\": \"query Weather { weatherByPoint(request: { lat: 52.37125, lon: 4.89388 }) { now { c: temperature f: temperature(unit: FAHRENHEIT) icon(format: SVG) } forecast { hours(first: 48) { edges { node { timestamp temperature } } } } } }\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{url}}",
+				"description": "StartFragment\n\n1. **Response Status (200 OK):**  \n    Ensures the request is processed successfully and the response status is 200, indicating that there are no issues with the request format or the server.\n    \n2. **Access Control:**  \n    Validates that there are no access restrictions based on the role (basic role). If access is denied, subsequent tests are not executed.\n    \n3. **Current Temperature Validation (Celsius & Fahrenheit):**  \n    Checks that the current temperature in both Celsius and Fahrenheit is present and falls within a reasonable range. This is important to ensure the weather data is accurate and meaningful.\n    \n4. **Weather Icon Validation:**  \n    Ensures the weather icon is provided in the SVG format, which is a common format for graphical icons and ensures scalability.\n    \n5. **48-Hour Forecast Data:**  \n    Confirms that the forecast provides valid hourly data for 48 hours, including correct timestamps and temperature readings, ensuring that future weather data is delivered correctly.\n    \n\nThis detailed test suite covers the main aspects of the weather data retrieved by the `weatherByPoint` query and ensures both current weather and future forecast data are valid and reliable.\n\nEndFragment"
+			},
+			"response": []
+		},
+		{
+			"name": "№10 Retrieve and Validate Daily Temperature Forecast with Time and Sunrise/Sunset Data",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Status Code 200\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Test 2: Check if access is denied for basic role\r",
+							"pm.test(\"Check if access is denied for basic role\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData.errors && jsonData.errors[0].message === \"access denied for basic role\") {\r",
+							"        pm.expect.fail(\"Access denied for basic role\");\r",
+							"    }\r",
+							"});\r",
+							"\r",
+							"// If access is not denied, continue with further validation\r",
+							"if (!pm.response.json().errors || pm.response.json().errors[0].message !== \"access denied for basic role\") {\r",
+							"    \r",
+							"    // Test 3: Validate presence of forecast data\r",
+							"    pm.test(\"Forecast data exists\", function () {\r",
+							"        var jsonData = pm.response.json();\r",
+							"        pm.expect(jsonData.data.weatherByPoint.forecast.days.length).to.be.greaterThan(0);\r",
+							"    });\r",
+							"    \r",
+							"    // Test 4: Validate average temperature for each part of the day\r",
+							"    pm.test(\"Validate average temperatures\", function () {\r",
+							"        var jsonData = pm.response.json();\r",
+							"        jsonData.data.weatherByPoint.forecast.days.forEach(day => {\r",
+							"            pm.expect(day.parts.morning.avgTemperature).to.be.a('number');\r",
+							"            pm.expect(day.parts.day.avgTemperature).to.be.a('number');\r",
+							"            pm.expect(day.parts.evening.avgTemperature).to.be.a('number');\r",
+							"            pm.expect(day.parts.night.avgTemperature).to.be.a('number');\r",
+							"        });\r",
+							"    });\r",
+							"\r",
+							"    // Test 5: Validate time, sunrise and sunset times\r",
+							"    pm.test(\"Validate time, sunrise, and sunset times\", function () {\r",
+							"        var jsonData = pm.response.json();\r",
+							"        jsonData.data.weatherByPoint.forecast.days.forEach(day => {\r",
+							"            pm.expect(day.time).to.be.a('string');\r",
+							"            pm.expect(day.sunriseTime).to.be.a('string');\r",
+							"            pm.expect(day.sunsetTime).to.be.a('string');\r",
+							"        });\r",
+							"    });\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Yandex-Weather-Key",
+						"value": "{{TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"query\": \"query { weatherByPoint(request: { lat: 52.37125, lon: 4.89388 }) { forecast { days(limit: 2) { time sunriseTime sunsetTime parts { morning { avgTemperature } day { avgTemperature } evening { avgTemperature } night { avgTemperature } } } } } }\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{url}}",
+				"description": "StartFragment\n\n### Test Description:\n\nThis test queries the weather forecast for a specific location (latitude: 52.37125, longitude: 4.89388) over a 2-day period. It retrieves the forecasted average temperatures for different parts of the day (morning, day, evening, and night), as well as the time, sunrise, and sunset times. The test ensures that all data points are returned in the correct format and within valid ranges for the forecasted period.\n\nEndFragment  \n  \nStartFragment\n\n- **Status Code 200**: Verifies that the API response has a 200 status, indicating a successful request.\n    \n- **Check Access Denied for Basic Role**: Checks if access is denied for users with basic roles; if denied, the test suite is canceled.\n    \n- **Validate Presence of Forecast Data**: Ensures that forecast data exists and is returned for at least one day.\n    \n- **Validate Average Temperatures**: Verifies that the average temperature for morning, day, evening, and night is returned as a number for each forecasted day.\n    \n- **Validate Time, Sunrise, and Sunset Times**: Ensures that the returned values for `time`, `sunriseTime`, and `sunsetTime` are valid strings for each forecasted day.\n    \n\nEndFragment"
+			},
+			"response": []
+		},
+		{
+			"name": "№11 Multi-City Weather Forecast Validation",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Status Code 200\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Test 2: Access Denied for Basic Role Check\r",
+							"pm.test(\"Check if access is denied for basic role\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    if (jsonData.errors && jsonData.errors[0].message === \"access denied for basic role\") {\r",
+							"        pm.expect.fail(\"Access denied for basic role\");\r",
+							"    }\r",
+							"});\r",
+							"\r",
+							"// Skip further tests if access is denied\r",
+							"if (!pm.response.json().errors || pm.response.json().errors[0].message !== \"access denied for basic role\") {\r",
+							"    // Test 3: Validate weather data for London\r",
+							"    pm.test(\"London weather data is valid\", function () {\r",
+							"        var jsonData = pm.response.json();\r",
+							"        var london = jsonData.data.London;\r",
+							"        if (london && london.forecast && london.forecast.days) {\r",
+							"            london.forecast.days.forEach(day => {\r",
+							"                pm.expect(day.summary.day.avgTemperature).to.be.a(\"number\");\r",
+							"                pm.expect(day.summary.night.avgTemperature).to.be.a(\"number\");\r",
+							"                pm.expect(day.summary.day.cloudiness).to.be.a(\"string\");\r",
+							"                pm.expect(day.summary.night.cloudiness).to.be.a(\"string\");\r",
+							"            });\r",
+							"        }\r",
+							"    });\r",
+							"\r",
+							"    // Test 4: Validate weather data for Warsaw\r",
+							"    pm.test(\"Warsaw weather data is valid\", function () {\r",
+							"        var jsonData = pm.response.json();\r",
+							"        var warsaw = jsonData.data.Warsaw;\r",
+							"        if (warsaw && warsaw.forecast && warsaw.forecast.days) {\r",
+							"            warsaw.forecast.days.forEach(day => {\r",
+							"                pm.expect(day.summary.day.avgTemperature).to.be.a(\"number\");\r",
+							"                pm.expect(day.summary.night.avgTemperature).to.be.a(\"number\");\r",
+							"                pm.expect(day.summary.day.cloudiness).to.be.a(\"string\");\r",
+							"                pm.expect(day.summary.night.cloudiness).to.be.a(\"string\");\r",
+							"            });\r",
+							"        }\r",
+							"    });\r",
+							"\r",
+							"    // Test 5: Validate weather data for Berlin\r",
+							"    pm.test(\"Berlin weather data is valid\", function () {\r",
+							"        var jsonData = pm.response.json();\r",
+							"        var berlin = jsonData.data.Berlin;\r",
+							"        if (berlin && berlin.forecast && berlin.forecast.days) {\r",
+							"            berlin.forecast.days.forEach(day => {\r",
+							"                pm.expect(day.summary.day.avgTemperature).to.be.a(\"number\");\r",
+							"                pm.expect(day.summary.night.avgTemperature).to.be.a(\"number\");\r",
+							"                pm.expect(day.summary.day.cloudiness).to.be.a(\"string\");\r",
+							"                pm.expect(day.summary.night.cloudiness).to.be.a(\"string\");\r",
+							"            });\r",
+							"        }\r",
+							"    });\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Yandex-Weather-Key",
+						"value": "{{TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"query\": \"query { London: weatherByPoint(request: { lat: 51.50730, lon: -0.12769 }) { ...WeatherData } Warsaw: weatherByPoint(request: { lat: 52.23209, lon: 21.00714 }) { ...WeatherData } Berlin: weatherByPoint(request: { lat: 52.51865, lon: 13.37471 }) { ...WeatherData } } fragment WeatherData on Weather { forecast { days(limit: 3) { summary { day { cloudiness humidity avgTemperature prec precType precStrength windSpeed windDirection } night { cloudiness humidity avgTemperature prec precType precStrength windSpeed windDirection } } } } }\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{url}}",
+				"description": "StartFragment\n\n- **Test 1:** Checks if the status code of the response is 200, ensuring the request was successful.\n    \n- **Test 2:** Verifies whether access is denied for the basic role. If denied, the test suite will fail and not proceed.\n    \n- **Test 3-5:** Each test validates the weather data for London, Warsaw, and Berlin. It checks for valid `avgTemperature`, `cloudiness`, and other fields for both day and night periods over a 3-day forecast.\n    \n\nEndFragment"
+			},
+			"response": []
+		},
+		{
+			"name": "№12  Validate Station Data Retrieval by Time Range",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 2: Verify Data Presence\r",
+							"pm.test(\"Response contains station data\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data.stationsByTimeRange).to.be.an('array').that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"// Test 3: Verify Specific Fields Exist\r",
+							"pm.test(\"Response contains expected weather fields\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data.stationsByTimeRange[0]).to.have.property(\"temperature\");\r",
+							"    pm.expect(jsonData.data.stationsByTimeRange[0]).to.have.property(\"humidity\");\r",
+							"    pm.expect(jsonData.data.stationsByTimeRange[0]).to.have.property(\"pressure\");\r",
+							"    pm.expect(jsonData.data.stationsByTimeRange[0]).to.have.property(\"precType\");\r",
+							"    pm.expect(jsonData.data.stationsByTimeRange[0]).to.have.property(\"windSpeed\");\r",
+							"});\r",
+							"\r",
+							"// Test 4: Check Valid Time Range\r",
+							"pm.test(\"Timestamps are within the specified time range\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var from = parseInt(\"1728777600\");\r",
+							"    var to = parseInt(\"1728820800\");\r",
+							"    jsonData.data.stationsByTimeRange.forEach(function(station) {\r",
+							"        var timestamp = parseInt(station.timestamp);\r",
+							"        pm.expect(timestamp).to.be.within(from, to);\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"// Test 5: Verify Correct Icon Formats\r",
+							"pm.test(\"Icons are in SVG format\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    jsonData.data.stationsByTimeRange.forEach(function(station) {\r",
+							"        pm.expect(station.icon).to.include(\".svg\");\r",
+							"        pm.expect(station.phenomIcon).to.include(\".svg\");\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Yandex-Weather-Key",
+						"value": "{{TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"query\": \"query stationsByTimeRange($request: PointInput!, $timeRange: TimeRange!) { stationsByTimeRange(request: $request, timeRange: $timeRange) { id code name lat lon time timestamp cloudiness condition distance feelsLike humidity icon(format: SVG) isThunder phenomCondition phenomIcon(format: SVG) prec precProbability precStrength precType pressure temperature waterTemperature windAngle windDirection windSpeed } }\",\r\n  \"variables\": {\r\n    \"request\": {\r\n      \"lat\": 47.27319717,\r\n      \"lon\": -119.7085724\r\n    },\r\n    \"timeRange\": {\r\n      \"from\": \"1728777600\",\r\n      \"to\": \"1728820800\"\r\n    }\r\n  }\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{url}}",
+				"description": "StartFragment\n\n- **Status Code is 200**:\n    \n    - **Objective**: Ensure that the API responds with a successful status (200 OK).\n        \n    - **Assertion**: The test will check if the response status is `200 OK`. If the status is not 200, the test fails.\n        \n- **Verify Data Presence in Response**:\n    \n    - **Objective**: Ensure that the `stationsByTimeRange` query returns data for the specified time range.\n        \n    - **Assertion**: The test checks if the `data.stationsByTimeRange` field contains results. If no stations data is returned, the test fails.\n        \n- **Verify Specific Fields Exist**:\n    \n    - **Objective**: Ensure that the response includes key weather data fields for each station, such as `temperature`, `humidity`, and `pressure`.\n        \n    - **Assertion**: The test checks that fields such as `temperature`, `humidity`, `pressure`, `precType`, and `windSpeed` are present for at least one station. If any field is missing, the test fails.\n        \n- **Check Valid Time Range**:\n    \n    - **Objective**: Ensure that the `timestamp` values in the response are within the specified `from` and `to` time range.\n        \n    - **Assertion**: The test will iterate through the `timestamp` values for the stations and verify that each timestamp falls within the provided time range. If any timestamp falls outside the range, the test fails.\n        \n- **Verify Correct Icon Formats**:\n    \n    - **Objective**: Ensure that the `icon` and `phenomIcon` are returned in SVG format, as specified.\n        \n    - **Assertion**: The test checks that the response includes the weather icons in `SVG` format for each station. If the icons are missing or not in the correct format, the test fails.\n        \n\nEndFragment"
+			},
+			"response": []
+		}
+	]
+}
