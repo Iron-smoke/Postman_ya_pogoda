@@ -99,3 +99,4 @@ API: Yandex Weather API
 Настройка API Ключа
 Чтобы использовать API Яндекс Погоды, необходимо иметь действительный API ключ. Добавьте ваш ключ в заголовок Authorization каждого запроса:
 'X-Yandex-Weather-Key': <ваш-api-ключ>
+{{url}} - https://api.weather.yandex.ru/graphql/query
