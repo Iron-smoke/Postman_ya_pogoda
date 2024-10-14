@@ -1,0 +1,143 @@
+{
+	"info": {
+		"_postman_id": "3836be83-689a-4b08-907e-811aaf2b03ea",
+		"name": "TG BT zoo_store",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "35027978"
+	},
+	"item": [
+		{
+			"name": "/start",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "chat_id",
+						"value": "7995313363",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "text",
+							"value": "/start",
+							"type": "text"
+						},
+						{
+							"key": "chat_id",
+							"value": "785493816",
+							"type": "text"
+						}
+					]
+				},
+				"url": "{{URL}}{{token}}/sendMessage"
+			},
+			"response": []
+		},
+		{
+			"name": "/help",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "chat_id",
+						"value": "7995313363",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "text",
+							"value": "/help",
+							"type": "text"
+						},
+						{
+							"key": "chat_id",
+							"value": "785493816",
+							"type": "text"
+						}
+					]
+				},
+				"url": "{{URL}}{{token}}/sendMessage"
+			},
+			"response": []
+		},
+		{
+			"name": "/help Copy",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "chat_id",
+						"value": "785493816",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "text",
+							"value": "Скидки",
+							"type": "text"
+						},
+						{
+							"key": "chat_id",
+							"value": "785493816",
+							"type": "text"
+						}
+					]
+				},
+				"url": "{{URL}}{{token}}/sendMessage\n"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": "7995313363:AAFLK5rhP3WzcTs-7QApvbcdXRAr8DciiSM",
+			"type": "string"
+		},
+		{
+			"key": "URL",
+			"value": "https://api.telegram.org/bot",
+			"type": "string"
+		}
+	]
+}
